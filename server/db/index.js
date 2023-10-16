@@ -1,17 +1,14 @@
 const { Sequelize } = require('sequelize');
+const UserModel = require('./models/User')
 
-const sequelize = new Sequelize('tenant_portal', 'root', 'root', {
-    host: 'db',
-    dialect: 'mysql'
+const sequelize = new Sequelize(
+	process.env.MYSQL_DATABASE || 'tenant_portal',
+	'root',
+	process.env.MYSQL_ROOT_PASSWORD || 'root', {
+	host: 'db',
+	dialect: 'mysql'
 });
 
-async function testConnection() {
-    try {
-        await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-    } catch (error) {
-        console.error('Unable to connect to the database:', error);
-    }
-}
+const User = UserModel(sequelize);
 
-module.exports = { sequelize, testConnection };
+module.exports = { sequelize, User };

@@ -1,16 +1,15 @@
 const express = require('express');
-const app = express();
+const { sequelize } = require('./db');
 const port = 3000;
 
-const { testConnection } = require('./db');
+const app = express();
 
-testConnection();
-
-app.get('/', (req, res) => {
-  res.send('Hello, Tenant Portal Backend');
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
-});
-
+sequelize.sync({ force: false })
+	.then(() => {
+		app.listen(port, () => {
+			console.log(`Server is running on port ${port}`)
+		})
+	})
+	.catch(err => {
+		console.error(`Server was not able to connect to the database: ${err}`)
+	});
