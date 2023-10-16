@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "Jon Skinner",
@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "mysql2": "^3.6.2",
+    "nodemon": "^3.0.1",
     "sequelize": "^6.33.0"
   }
 }

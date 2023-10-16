@@ -1,8 +1,13 @@
 const express = require('express');
+const logger = require('./middleware/logger');
 const { sequelize } = require('./db');
+const app = express();
 const port = 3000;
 
-const app = express();
+app.use(express.json())
+app.use(logger);
+
+app.get('/', )
 
 sequelize.sync({ force: false })
 	.then(() => {
@@ -12,4 +17,4 @@ sequelize.sync({ force: false })
 	})
 	.catch(err => {
 		console.error(`Server was not able to connect to the database: ${err}`)
-	});
+	})
