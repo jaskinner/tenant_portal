@@ -1,9 +1,9 @@
 const request = require('supertest');
-const myApp = require('../app');  // Replace with your app's path
+const app = require('../app');
 
-describe('GET /', () => {
-	it('responds with 200', async () => {
-		const response = await request(myApp).get('/');
+describe("Test the root path", () => {
+	test("There should be GET ", async () => {
+		const response = await request(app).get("/");
 		expect(response.statusCode).toBe(200);
 	});
 });
