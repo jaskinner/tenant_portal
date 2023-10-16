@@ -2,6 +2,10 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+const { testConnection } = require('./db');
+
+testConnection();
+
 app.get('/', (req, res) => {
   res.send('Hello, Tenant Portal Backend');
 });
@@ -9,3 +13,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
+
