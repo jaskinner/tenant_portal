@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../../app');
-const { db } = require('../../db');
+const db = require('../../db/db');
 
 // init user_id for suite-wide testing and increment one for user that doesn't exist
 let createdUserId;
