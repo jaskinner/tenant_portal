@@ -21,10 +21,10 @@ exports.createUser = async (req, res) => {
 	try {
 		const { username, password, role } = req.body;
 		const password_hash = await hashPassword(password);
-		
+
 		const newUser = await User.create({ username, password_hash, role });
 
-		res.status(HTTP_STATUS.CREATED).json({
+		return res.status(HTTP_STATUS.CREATED).json({
 			message: 'User created successfully!',
 			user: {
 				user_id: newUser.user_id,
@@ -33,7 +33,7 @@ exports.createUser = async (req, res) => {
 			}
 		});
 	} catch (error) {
-		handleError(error, res);
+		return handleError(error, res);
 	}
 }
 
@@ -52,7 +52,7 @@ exports.updateUser = async (req, res) => {
 
 		return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User not found' });
 	} catch (error) {
-		handleError(error, res);
+		return handleError(error, res);
 	}
 }
 
@@ -70,7 +70,6 @@ exports.deleteUser = async (req, res) => {
 
 		return res.status(200).json({ message: 'User deleted successfully' });
 	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ message: `Internal Server Error ${error}` });
+		return handleError(error, res);
 	}
 }
