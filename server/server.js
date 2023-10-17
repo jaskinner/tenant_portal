@@ -1,5 +1,5 @@
 const app = require('./app');
-const db = require('./db/sequelize')
+const { db, User } = require('./db')
 const port = 3000;
 
 db.sync({ force: false })

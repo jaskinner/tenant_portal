@@ -1,17 +1,17 @@
 const request = require('supertest');
 const app = require('../../app');
-const sequelize = require('../../db/sequelize');
+const { db } = require('../../db');
 
 // init user_id for suite-wide testing and increment one for user that doesn't exist
 let createdUserId;
 let nonExistentUserId = createdUserId + 1;
 
 beforeAll(async () => {
-	sequelize.sync({ force: true });
+	db.sync({ force: true });
 });
 
 afterAll(async () => {
-	await sequelize.close()
+	await db.close()
 });
 
 test('POST /users', async () => {
