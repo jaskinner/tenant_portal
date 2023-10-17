@@ -2,7 +2,9 @@ const request = require('supertest');
 const app = require('../../app');
 const sequelize = require('../../db/sequelize');
 
+// init user_id for suite-wide testing and increment one for user that doesn't exist
 let createdUserId;
+let nonExistentUserId = createdUserId + 1;
 
 beforeAll(async () => {
 	sequelize.sync({ force: true });
@@ -31,12 +33,21 @@ test('POST /users malformed username', async () => {
 	expect(response.body.user).toBeUndefined();
 });
 
-test('GET /user does not exist', async () => {
-	const idDoesNotExist = createdUserId + 1;
+test('POST /users empty username', async () => {
 	const response = await request(app)
-		.get('/users/');
+		.post('/users')
+		.send({ username: "", password: 'password', role: 'admin' });
 
-	expect(response.statusCode).toBe(404);
+	expect(response.statusCode).toBe(400);
+	expect(response.body.user).toBeUndefined();
+});
+
+test('POST /users missing username', async () => {
+	const response = await request(app)
+		.post('/users')
+		.send({ password: 'password', role: 'admin' });
+
+	expect(response.statusCode).toBe(400);
 	expect(response.body.user).toBeUndefined();
 });
 
@@ -46,6 +57,14 @@ test('GET /users', async () => {
 
 	expect(response.statusCode).toBe(200);
 	expect(response.body.user.username).toBe('testuser');
+});
+
+test('GET /users', async () => {
+	const response = await request(app)
+		.get(`/users/${nonExistentUserId}`);
+
+	expect(response.statusCode).toBe(404);
+	expect(response.body.user).toBeUndefined();
 });
 
 test('PUT /users', async () => {
