@@ -20,7 +20,9 @@ services:
   db:
     image: mysql:latest
     environment:
+      - MYSQL_ROOT_USER=root
       - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_HOST=root
       - MYSQL_DATABASE=tenant_portal
     ports:
       - "42333:3306"

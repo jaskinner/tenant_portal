@@ -1,13 +1,12 @@
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(
-	process.env.MYSQL_DATABASE || 'tenant_portal',
-	'root',
-	process.env.MYSQL_ROOT_PASSWORD || 'root',
-	{
-		host: 'db',
-		dialect: 'mysql'
-	}
-);
+// TODO: fix db connection with fresh user not root
+const sequelize = new Sequelize({
+	dialect: 'mysql',
+	host: process.env.MYSQL_HOST || 'db',
+	username: process.env.MYSQL_USER || 'root',
+	password: process.env.MYSQL_PASSWORD || 'root',
+	database: process.env.MYSQL_DATABASE || 'tenant_portal',
+});
 
 module.exports = sequelize;

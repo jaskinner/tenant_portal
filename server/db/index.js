@@ -1,6 +1,4 @@
 const sequelize = require('./sequelize');
-const UserModel = require('./models/User')
-
-const User = UserModel();
+const User = require('./models/User');
 
 module.exports = { sequelize, User };
