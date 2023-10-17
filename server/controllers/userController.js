@@ -1,15 +1,5 @@
-const bcrypt = require('bcrypt');
 const User = require('../db/models/User');
-const HTTP_STATUS = require('../utils/httpStatusCodes'); // Or define your own constants
-
-const hashPassword = async (password) => {
-	return await bcrypt.hash(password, 10);
-}
-
-const handleError = (error, res) => {
-	console.error(error);
-	return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: `Internal Server Error: ${error}` });
-}
+const { HTTP_STATUS, hashPassword, handleError } = require('../utils/helpers');
 
 exports.getUser = async (req, res) => {
 	const id = req.params.id;
@@ -31,7 +21,7 @@ exports.createUser = async (req, res) => {
 	try {
 		const { username, password, role } = req.body;
 		const password_hash = await hashPassword(password);
-
+		
 		const newUser = await User.create({ username, password_hash, role });
 
 		res.status(HTTP_STATUS.CREATED).json({
