@@ -2,85 +2,118 @@ const request = require('supertest');
 const app = require('../../app');
 const db = require('../../db/db');
 
-// init user_id for suite-wide testing and increment one for user that doesn't exist
-let createdUserId;
-let nonExistentUserId = createdUserId + 1;
-
 beforeAll(async () => {
-	db.sync({ force: true });
+	await db.sync({ force: true });
 });
 
 afterAll(async () => {
 	await db.close()
 });
 
-test('POST /users', async () => {
-	const response = await request(app)
-		.post('/users')
-		.send({ username: 'testuser', password: 'password', role: 'admin' });
+describe("USER CRUD", () => {
+	let createdUserId;
 
-	createdUserId = response.body.user.user_id;
-	expect(response.statusCode).toBe(201);
-	expect(response.body.user.username).toBe('testuser');
+	beforeEach(async () => {
+		const response = await request(app)
+			.post('/users')
+			.send({ username: 'testuser', password: 'password', role: 'admin' });
+
+		createdUserId = response.body.user.user_id;
+	});
+
+	afterEach(async () => {
+		await request(app).delete(`/users/${createdUserId}`);
+	});
+
+	test('GET /users with id OK', async () => {
+		const response = await request(app)
+			.get(`/users/${createdUserId}`);
+
+		expect(response.statusCode).toBe(200);
+		expect(response.body.user.username).toBe('testuser');
+	});
+
+	test('GET /users nonexistent id 404', async () => {
+		const nonExistentUserId = createdUserId + 1;
+		const response = await request(app)
+			.get(`/users/${nonExistentUserId}`);
+
+		expect(response.statusCode).toBe(404);
+		expect(response.body.user).toBeUndefined();
+	});
+
+	test('PUT /users username with id OK', async () => {
+		const response = await request(app)
+			.put(`/users/${createdUserId}`)
+			.send({ username: "putuser" });
+
+		expect(response.statusCode).toBe(200);
+		expect(response.body.user.username).toBe("putuser");
+		expect(response.body.user.user_id).toBe(createdUserId);
+	});
+
+	test('PUT /users password with id OK', async () => {
+		const response = await request(app)
+			.put(`/users/${createdUserId}`)
+			.send({ password: "newpass" });
+
+		expect(response.statusCode).toBe(200);
+		expect(response.body.user.user_id).toBe(createdUserId);
+	});
+
+	test('PUT /users role with id OK', async () => {
+		const response = await request(app)
+			.put(`/users/${createdUserId}`)
+			.send({ role: "tenant" });
+
+		expect(response.statusCode).toBe(200);
+		expect(response.body.user.role).toBe("tenant");
+		expect(response.body.user.user_id).toBe(createdUserId);
+	});
+
+	test('DELETE /users with id OK', async () => {
+		const response = await request(app)
+			.delete(`/users/${createdUserId}`);
+
+		expect(response.statusCode).toBe(200);
+		expect(response.body.user).toBeUndefined();
+	});
 });
 
-test('POST /users malformed username', async () => {
-	const response = await request(app)
-		.post('/users')
-		.send({ username: "1234_abc**", password: 'password', role: 'admin' });
+describe("USER validation", () => {
+	test('POST /users OK', async () => {
+		const response = await request(app)
+			.post('/users')
+			.send({ username: 'testuser', password: 'password', role: 'admin' });
 
-	expect(response.statusCode).toBe(400);
-	expect(response.body.user).toBeUndefined();
-});
+		expect(response.statusCode).toBe(201);
+		expect(response.body.user.username).toBe('testuser');
+	});
 
-test('POST /users empty username', async () => {
-	const response = await request(app)
-		.post('/users')
-		.send({ username: "", password: 'password', role: 'admin' });
+	test('POST /users malformed username', async () => {
+		const response = await request(app)
+			.post('/users')
+			.send({ username: "1234_abc**", password: 'password', role: 'admin' });
 
-	expect(response.statusCode).toBe(400);
-	expect(response.body.user).toBeUndefined();
-});
+		expect(response.statusCode).toBe(400);
+		expect(response.body.user).toBeUndefined();
+	});
 
-test('POST /users missing username', async () => {
-	const response = await request(app)
-		.post('/users')
-		.send({ password: 'password', role: 'admin' });
+	test('POST /users empty username', async () => {
+		const response = await request(app)
+			.post('/users')
+			.send({ username: "", password: 'password', role: 'admin' });
 
-	expect(response.statusCode).toBe(400);
-	expect(response.body.user).toBeUndefined();
-});
+		expect(response.statusCode).toBe(400);
+		expect(response.body.user).toBeUndefined();
+	});
 
-test('GET /users', async () => {
-	const response = await request(app)
-		.get(`/users/${createdUserId}`);
+	test('POST /users missing username', async () => {
+		const response = await request(app)
+			.post('/users')
+			.send({ password: 'password', role: 'admin' });
 
-	expect(response.statusCode).toBe(200);
-	expect(response.body.user.username).toBe('testuser');
-});
-
-test('GET /users', async () => {
-	const response = await request(app)
-		.get(`/users/${nonExistentUserId}`);
-
-	expect(response.statusCode).toBe(404);
-	expect(response.body.user).toBeUndefined();
-});
-
-test('PUT /users', async () => {
-	const response = await request(app)
-		.put(`/users/${createdUserId}`)
-		.send({ username: 'tenantuser', password: 'newpass', role: 'tenant' });
-
-	expect(response.statusCode).toBe(200);
-	expect(response.body.user.username).toBe('tenantuser');
-	expect(response.body.user.role).toBe('tenant');
-});
-
-test('DELETE /users', async () => {
-	const response = await request(app)
-		.delete(`/users/${createdUserId}`);
-
-	expect(response.statusCode).toBe(200);
-	expect(response.body.user).toBeUndefined();
+		expect(response.statusCode).toBe(400);
+		expect(response.body.user).toBeUndefined();
+	});
 });
