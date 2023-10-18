@@ -1,11 +1,10 @@
 const express = require('express');
 const morgan = require('morgan');
-const router = require('./router');
-const { userController } = require('./controllers/userController')
+const router = require('./routes');
 const app = express();
 
 app.use(express.json());
 app.use(morgan('combined'));
-app.use(router);
+app.use('/api', router);
 
 module.exports = app;
