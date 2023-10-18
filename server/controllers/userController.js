@@ -1,27 +1,25 @@
-const bcrypt = require('bcrypt');
 const User = require('../db/models/User');
-const HTTP_STATUS = require('../utils/httpStatusCodes'); // Or define your own constants
+const { HTTP_STATUS, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
 
-const hashPassword = async (password) => {
-	return await bcrypt.hash(password, 10);
-}
+exports.getUsers = async (req, res) => {
+	try {
+		const users = await User.findAll();
 
-const handleError = (error, res) => {
-	console.error(error);
-	return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: `Internal Server Error: ${error}` });
+		handleSuccess({ users: users }, res);
+	} catch (error) {
+		handleError(error, res);
+	}
 }
 
 exports.getUser = async (req, res) => {
 	const id = req.params.id;
 
-	if (!id) return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Invalid ID' });
-
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User not found' });
+		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
 
-		return res.status(HTTP_STATUS.OK).json({ user: user });
+		handleSuccess({ user: user }, res);
 	} catch (error) {
 		handleError(error, res);
 	}
@@ -34,14 +32,7 @@ exports.createUser = async (req, res) => {
 
 		const newUser = await User.create({ username, password_hash, role });
 
-		res.status(HTTP_STATUS.CREATED).json({
-			message: 'User created successfully!',
-			user: {
-				user_id: newUser.user_id,
-				username: newUser.username,
-				role: newUser.role
-			}
-		});
+		handleSuccess({ user: newUser }, res, HTTP_STATUS.CREATED);
 	} catch (error) {
 		handleError(error, res);
 	}
@@ -51,16 +42,31 @@ exports.updateUser = async (req, res) => {
 	try {
 		const id = req.params.id;
 		const { username, password, role } = req.body;
-		const password_hash = await hashPassword(password);
 
-		const [updated] = await User.update({ username, password_hash, role }, { where: { user_id: id } });
+		let updateData = {};
+
+		if (username !== undefined) {
+			updateData.username = username;
+		}
+
+		if (password !== null && password !== undefined) {
+			updateData.password_hash = await hashPassword(password);
+		}
+
+		if (role !== undefined) {
+			updateData.role = role;
+		}
+
+		const [updated] = await User.update(updateData, { where: { user_id: id } });
 
 		if (updated) {
 			const updatedUser = await User.findOne({ where: { user_id: id } });
-			return res.status(HTTP_STATUS.OK).json({ user: updatedUser });
+			if (updatedUser) {
+				return handleSuccess({ user: updatedUser }, res);
+			}
 		}
 
-		return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User not found' });
+		handleError({ message: 'Update failed or user not found' }, res);
 	} catch (error) {
 		handleError(error, res);
 	}
@@ -69,18 +75,17 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
 	const id = req.params.id;
 
-	if (!id) return res.status(400).json({ message: 'Invalid ID' });
+	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
 
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return res.status(404).json({ message: 'User not found' });
+		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
 
 		await User.destroy({ where: { user_id: id } });
 
-		return res.status(200).json({ message: 'User deleted successfully' });
+		handleSuccess({ message: 'User deleted successfully' }, res);
 	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ message: `Internal Server Error ${error}` });
+		handleError(error, res);
 	}
 }
