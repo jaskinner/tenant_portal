@@ -18,6 +18,7 @@ const handleSuccess = (data, res, statusCode = HTTP_STATUS.OK) => {
 	if (statusCode === HTTP_STATUS.CREATED) {
 		return res.status(HTTP_STATUS.CREATED).json(data);
 	}
+	
 	res.status(HTTP_STATUS.OK).json(data);
 }
 
