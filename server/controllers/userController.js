@@ -73,12 +73,12 @@ exports.updateUserById = (User) => async (req, res) => {
 exports.deleteUser = (User) => async (req, res) => {
 	const id = req.params.id;
 
-	if (!id) return handleError(ERR_MESSAGES.INVALID_ID, res, HTTP_STATUS.BAD_REQUEST);
+	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
 
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
+		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
 
 		await User.destroy({ where: { user_id: id } });
 

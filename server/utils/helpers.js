@@ -3,23 +3,38 @@ const { HTTP_STATUS, ERR_MESSAGES } = require('./constants');
 const { Sequelize } = require('sequelize');
 
 const handleError = (error, res, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR) => {
-	if (statusCode === HTTP_STATUS.BAD_REQUEST || error instanceof Sequelize.ValidationError) {
-		return res.status(HTTP_STATUS.BAD_REQUEST).json(error);
+	let response = {
+		status: '',
+	}
+
+	if (statusCode === HTTP_STATUS.BAD_REQUEST) {
+		response.status = 'fail';
+		response.data = error;
+		return res.status(HTTP_STATUS.BAD_REQUEST).json(response);
 	}
 
 	if (statusCode === HTTP_STATUS.NOT_FOUND) {
-		return res.status(HTTP_STATUS.NOT_FOUND).json(error);
+		response.status = 'fail';
+		response.data = { message: 'Resource not found' };
+		return res.status(HTTP_STATUS.NOT_FOUND).json(response);
 	}
 
-	return res.status(statusCode).json(error);
+	response.status = 'error';
+	response.message = error.message || 'An error occurred'
+	return res.status(statusCode).json(response);
 };
 
 const handleSuccess = (data, res, statusCode = HTTP_STATUS.OK) => {
-	if (statusCode === HTTP_STATUS.CREATED) {
-		return res.status(HTTP_STATUS.CREATED).json(data);
-	}
+	let response = {
+		status: 'success',
+		data
+	};
 	
-	res.status(HTTP_STATUS.OK).json(data);
+	if (statusCode === HTTP_STATUS.CREATED) {
+		return res.status(HTTP_STATUS.CREATED).json(response);
+	}
+
+	res.status(HTTP_STATUS.OK).json(response);
 }
 
 const hashPassword = async (password) => {
