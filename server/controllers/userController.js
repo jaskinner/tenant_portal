@@ -58,7 +58,7 @@ exports.updateUserById = (User) => async (req, res) => {
 		const [updated] = await User.update(updateData, { where: { user_id: id } });
 
 		if (updated) {
-			const updatedUser = await User.findOne({ where: { user_id: id } });
+			const updatedUser = await User.findByPk({ where: { user_id: id } });
 			if (updatedUser) {
 				return handleSuccess({ user: updatedUser }, res);
 			}
@@ -70,54 +70,20 @@ exports.updateUserById = (User) => async (req, res) => {
 	}
 }
 
-// exports.updateUser = async (req, res) => {
-// 	try {
-// 		const id = req.params.id;
-// 		const { username, password, role } = req.body;
+exports.deleteUser = async (req, res) => {
+	const id = req.params.id;
 
-// 		let updateData = {};
+	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
 
-// 		if (username !== undefined) {
-// 			updateData.username = username;
-// 		}
+	try {
+		const user = await User.findByPk(id);
 
-// 		if (password !== null && password !== undefined) {
-// 			updateData.password_hash = await hashPassword(password);
-// 		}
+		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
 
-// 		if (role !== undefined) {
-// 			updateData.role = role;
-// 		}
+		await User.destroy({ where: { user_id: id } });
 
-// 		const [updated] = await User.update(updateData, { where: { user_id: id } });
-
-// 		if (updated) {
-// 			const updatedUser = await User.findOne({ where: { user_id: id } });
-// 			if (updatedUser) {
-// 				return handleSuccess({ user: updatedUser }, res);
-// 			}
-// 		}
-
-// 		handleError({ message: 'Update failed or user not found' }, res);
-// 	} catch (error) {
-// 		handleError(error, res);
-// 	}
-// }
-
-// exports.deleteUser = async (req, res) => {
-// 	const id = req.params.id;
-
-// 	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
-
-// 	try {
-// 		const user = await User.findByPk(id);
-
-// 		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
-
-// 		await User.destroy({ where: { user_id: id } });
-
-// 		handleSuccess({ message: 'User deleted successfully' }, res);
-// 	} catch (error) {
-// 		handleError(error, res);
-// 	}
-// }
+		handleSuccess({ message: 'User deleted successfully' }, res);
+	} catch (error) {
+		handleError(error, res);
+	}
+}

@@ -2,14 +2,18 @@ const userController = require('../../controllers/userController');
 const { HTTP_STATUS } = require('../../utils/constants');
 
 UserArrayMock = [
-	{ user_id: 1, username: 'owneruser', password: 'password', role: 'owner' },
-	{ user_id: 2, username: 'manageruser', password: 'password', role: 'manager' },
-	{ user_id: 3, username: 'tenantuser', password: 'password', role: 'tenant' }
+	{ user_id: 1, username: 'owneruser', password_hash: 'password', role: 'owner' },
+	{ user_id: 2, username: 'manageruser', password_hash: 'password', role: 'manager' },
+	{ user_id: 3, username: 'tenantuser', password_hash: 'password', role: 'tenant' }
 ];
 
 const UserMock = {
 	findAll: jest.fn().mockReturnValue(UserArrayMock),
 	findByPk: jest.fn().mockReturnValue(UserArrayMock[2]),
+	// findOne: jest.fn((options) => {
+	// 	let id = options.where.user_id;
+	// 	return UserArrayMock[id];
+	// }),
 	create: jest.fn((newUser) => {
 		return {
 			user_id: Math.floor(Math.random() * 100),
@@ -17,12 +21,15 @@ const UserMock = {
 		}
 	}),
 	update: jest.fn((updateData, options) => {
-		const id = options.where.id;
+		const id = options.where.user_id;
 		if (!id) {
 			return [0];
 		}
-		updatedUsers[id] = { ...updatedUsers[id], ...updateData };
-		return [1, [updatedUsers[id]]];  // 1 row updated, and the updated row
+		UserArrayMock[id] = { ...UserArrayMock[id], ...updateData };
+		return [1, [UserArrayMock[id]]];
+	}),
+	delete: jest.fn(() => {
+		
 	}),
 }
 
@@ -85,7 +92,7 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 			}));
 	});
 
-	test('Should update user username by ID successfully', async () => {
+	test('Should update user by ID successfully', async () => {
 		const req = {
 			body: {
 				username: "Jon234",
@@ -105,43 +112,28 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		await updateUserWithMock(req, res);
 
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
-		// expect(res.json)
-		// 	.toHaveBeenCalledWith(expect.objectContaining({
-		// 		user: {
-		// 			user_id: expect.any(Number),
-		// 			password_hash: expect.any(String),
-		// 			username: expect.any(String),
-		// 			role: expect.any(String),
-		// 		}
-		// 	}));
+		expect(res.json)
+			.toHaveBeenCalledWith(expect.objectContaining({
+				user: {
+					user_id: expect.any(Number),
+					password_hash: expect.any(String),
+					username: expect.any(String),
+					role: expect.any(String),
+				}
+			}));
 	});
 
-	// test('Should update user password by ID successfully', async () => {
-	// 	const response = await request(app)
-	// 		.put(`${userPath}/${createdUserId}`)
-	// 		.send({ password: "newpass" });
+	test('Should deny user record delete without ID', async () => {
+		const deleteUserWithMock = userController.deleteUser(UserMock);
+		await deleteUserWithMock(req, res);
 
-	// 	expect(response.statusCode).toBe(200);
-	// 	expect(response.body.user.user_id).toBe(createdUserId);
-	// });
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+	});
 
-	// test('Should update user role by ID successfully', async () => {
-	// 	const response = await request(app)
-	// 		.put(`${userPath}/${createdUserId}`)
-	// 		.send({ role: "tenant" });
-
-	// 	expect(response.statusCode).toBe(200);
-	// 	expect(response.body.user.role).toBe("tenant");
-	// 	expect(response.body.user.user_id).toBe(createdUserId);
-	// });
-
-	// test('Should remove a user record by ID successfully', async () => {
-	// 	const response = await request(app)
-	// 		.delete(`${userPath}/${createdUserId}`);
-
-	// 	expect(response.statusCode).toBe(200);
-	// 	expect(response.body.user).toBeUndefined();
-	// });
+	test('Should remove a user record by ID successfully', async () => {
+		expect(response.statusCode).toBe(200);
+		expect(response.body.user).toBeUndefined();
+	});
 });
 
 // describe("User Input Validations and Edge Cases", () => {
