@@ -1,7 +1,6 @@
-const User = require('../db/models/User');
-const { HTTP_STATUS, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
+const { HTTP_STATUS, ERR_MESSAGES, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
 
-exports.getUsers = async (req, res) => {
+exports.getAllUsers = (User) => async (req, res) => {
 	try {
 		const users = await User.findAll();
 
@@ -11,13 +10,13 @@ exports.getUsers = async (req, res) => {
 	}
 }
 
-exports.getUser = async (req, res) => {
+exports.getUser = (User) => async (req, res) => {
 	const id = req.params.id;
 
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
+		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		handleSuccess({ user: user }, res);
 	} catch (error) {
@@ -25,11 +24,10 @@ exports.getUser = async (req, res) => {
 	}
 }
 
-exports.createUser = async (req, res) => {
+exports.createUser = (User) => async (req, res) => {
 	try {
 		const { username, password, role } = req.body;
 		const password_hash = await hashPassword(password);
-
 		const newUser = await User.create({ username, password_hash, role });
 
 		handleSuccess({ user: newUser }, res, HTTP_STATUS.CREATED);
@@ -38,7 +36,7 @@ exports.createUser = async (req, res) => {
 	}
 }
 
-exports.updateUser = async (req, res) => {
+exports.updateUserById = (User) => async (req, res) => {
 	try {
 		const id = req.params.id;
 		const { username, password, role } = req.body;
@@ -60,7 +58,7 @@ exports.updateUser = async (req, res) => {
 		const [updated] = await User.update(updateData, { where: { user_id: id } });
 
 		if (updated) {
-			const updatedUser = await User.findOne({ where: { user_id: id } });
+			const updatedUser = await User.findByPk(id);
 			if (updatedUser) {
 				return handleSuccess({ user: updatedUser }, res);
 			}
@@ -72,15 +70,15 @@ exports.updateUser = async (req, res) => {
 	}
 }
 
-exports.deleteUser = async (req, res) => {
+exports.deleteUser = (User) => async (req, res) => {
 	const id = req.params.id;
 
-	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
+	if (!id) return handleError(ERR_MESSAGES.INVALID_ID, res, HTTP_STATUS.BAD_REQUEST);
 
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
+		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		await User.destroy({ where: { user_id: id } });
 

@@ -1,6 +1,6 @@
 FROM node:lts
 
-WORKDIR /app/server
+WORKDIR /server
 
 COPY package*.json ./
 

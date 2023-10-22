@@ -6,23 +6,24 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./client:/app/client
-      - /app/client/node_modules
+      - ./client:/client
+      - /client/node_modules
 
   server:
     build: ./server
     ports:
       - "3000:3000"
     volumes:
-      - ./server:/app/server
-      - /app/server/node_modules
+      - ./server:/server
+      - /server/node_modules
 
   db:
     image: mysql:latest
     environment:
-      - MYSQL_ROOT_USER=root
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_HOST=root
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_HOST=db
       - MYSQL_DATABASE=tenant_portal
+      - MYSQL_USER=app_user
+      - MYSQL_PASSWORD=password
     ports:
       - "42333:3306"
