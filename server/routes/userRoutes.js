@@ -8,6 +8,6 @@ userRoutes.get('/', userController.getAllUsers(User));
 userRoutes.get('/:id', userController.getUser(User));
 userRoutes.post('/', userController.createUser(User));
 userRoutes.put('/:id', userController.updateUserById(User));
-// userRoutes.delete('/:id', userController.deleteUser(User));
+userRoutes.delete('/:id', userController.deleteUser(User));
 
 module.exports = userRoutes;

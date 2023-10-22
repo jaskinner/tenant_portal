@@ -5,3 +5,8 @@ exports.HTTP_STATUS = {
 	NOT_FOUND: 404,
 	INTERNAL_SERVER_ERROR: 500,
 };
+
+exports.ERR_MESSAGES = {
+	INVALID_ID: 'Invalid ID',
+	USER_NOT_FOUND: 'User not found',
+}

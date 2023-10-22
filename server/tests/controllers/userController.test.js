@@ -1,5 +1,5 @@
 const userController = require('../../controllers/userController');
-const { HTTP_STATUS } = require('../../utils/constants');
+const { HTTP_STATUS, ERR_MESSAGES } = require('../../utils/constants');
 
 UserArrayMock = [
 	{ user_id: 1, username: 'owneruser', password_hash: 'password', role: 'owner' },
@@ -9,11 +9,9 @@ UserArrayMock = [
 
 const UserMock = {
 	findAll: jest.fn().mockReturnValue(UserArrayMock),
-	findByPk: jest.fn().mockReturnValue(UserArrayMock[2]),
-	// findOne: jest.fn((options) => {
-	// 	let id = options.where.user_id;
-	// 	return UserArrayMock[id];
-	// }),
+	findByPk: jest.fn((id) => {
+		return UserArrayMock[id];
+	}),
 	create: jest.fn((newUser) => {
 		return {
 			user_id: Math.floor(Math.random() * 100),
@@ -28,15 +26,17 @@ const UserMock = {
 		UserArrayMock[id] = { ...UserArrayMock[id], ...updateData };
 		return [1, [UserArrayMock[id]]];
 	}),
-	delete: jest.fn(() => {
-		
+	destroy: jest.fn((options) => {
+		const id = options.where.user_id;
+
+		return {}
 	}),
 }
 
 describe("User Operations: Create, Read, Update, Delete", () => {
 
 	test('Should retrieve a user by ID successfully', async () => {
-		const req = { params: { id: 3 } };
+		const req = { params: { id: 2 } };
 		const res = {
 			json: jest.fn(),
 			status: jest.fn(() => res)
@@ -47,6 +47,20 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
 		expect(res.json).toBeCalledWith({ user: UserArrayMock[2] });
+	});
+
+	test('Should fail for nonexistent user', async () => {
+		const req = { params: { id: 3 } }
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const getUserWithMock = userController.getUser(UserMock);
+		await getUserWithMock(req, res);
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
+		expect(res.json).toBeCalledWith(ERR_MESSAGES.USER_NOT_FOUND);
 	});
 
 	test('Should get all users successfully', async () => {
@@ -100,7 +114,7 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 				role: "admin"
 			},
 			params: {
-				id: 3
+				id: 2
 			}
 		};
 		const res = {
@@ -124,51 +138,34 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 	});
 
 	test('Should deny user record delete without ID', async () => {
+		const req = { params: {} };
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
 		const deleteUserWithMock = userController.deleteUser(UserMock);
 		await deleteUserWithMock(req, res);
 
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(ERR_MESSAGES.INVALID_ID)
 	});
 
 	test('Should remove a user record by ID successfully', async () => {
-		expect(response.statusCode).toBe(200);
-		expect(response.body.user).toBeUndefined();
+		const req = {
+			params: {
+				id: 2
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const deleteUserWithMock = userController.deleteUser(UserMock);
+		await deleteUserWithMock(req, res);
+
+		expect(res.status).toHaveBeenCalledWith(200);
+		expect(res.json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
 	});
 });
-
-// describe("User Input Validations and Edge Cases", () => {
-// 	test('Should return 404 for a nonexistent ID', async () => {
-// 		const response = await request(app)
-// 			.get(`${userPath}/100`);
-
-// 		expect(response.statusCode).toBe(404);
-// 		expect(response.body.user).toBeUndefined();
-// 	});
-
-// 	test('Should reject malformed username update', async () => {
-// 		const response = await request(app)
-// 			.post(userPath)
-// 			.send({ username: "1234_abc**", password: 'password', role: 'admin' });
-
-// 		expect(response.statusCode).toBe(400);
-// 		expect(response.body.user).toBeUndefined();
-// 	});
-
-// 	test('Should reject empty username update', async () => {
-// 		const response = await request(app)
-// 			.post(userPath)
-// 			.send({ username: "", password: 'password', role: 'admin' });
-
-// 		expect(response.statusCode).toBe(400);
-// 		expect(response.body.user).toBeUndefined();
-// 	});
-
-// 	test('Should reject missing username user creation', async () => {
-// 		const response = await request(app)
-// 			.post(userPath)
-// 			.send({ password: 'password', role: 'admin' });
-
-// 		expect(response.statusCode).toBe(400);
-// 		expect(response.body.user).toBeUndefined();
-// 	});
-// });

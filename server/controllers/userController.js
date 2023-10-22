@@ -1,4 +1,4 @@
-const { HTTP_STATUS, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
+const { HTTP_STATUS, ERR_MESSAGES, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
 
 exports.getAllUsers = (User) => async (req, res) => {
 	try {
@@ -16,7 +16,7 @@ exports.getUser = (User) => async (req, res) => {
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
+		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		handleSuccess({ user: user }, res);
 	} catch (error) {
@@ -58,7 +58,7 @@ exports.updateUserById = (User) => async (req, res) => {
 		const [updated] = await User.update(updateData, { where: { user_id: id } });
 
 		if (updated) {
-			const updatedUser = await User.findByPk({ where: { user_id: id } });
+			const updatedUser = await User.findByPk(id);
 			if (updatedUser) {
 				return handleSuccess({ user: updatedUser }, res);
 			}
@@ -70,15 +70,15 @@ exports.updateUserById = (User) => async (req, res) => {
 	}
 }
 
-exports.deleteUser = async (req, res) => {
+exports.deleteUser = (User) => async (req, res) => {
 	const id = req.params.id;
 
-	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
+	if (!id) return handleError(ERR_MESSAGES.INVALID_ID, res, HTTP_STATUS.BAD_REQUEST);
 
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
+		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		await User.destroy({ where: { user_id: id } });
 
