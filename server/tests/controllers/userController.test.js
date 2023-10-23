@@ -127,6 +127,78 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 			.toHaveBeenCalledWith(expect.objectContaining(expectedResponse));
 	});
 
+	test('Should not create new user without username', async () => {
+		const req = {
+			body: {
+				"password": "testing",
+				"role": "admin"
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const createUserWithMock = userController.createUser(UserMock);
+		await createUserWithMock(req, res);
+
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Username cannot be null' }
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(expectedResponse)
+	});
+
+	test('Should not create new user without password', async () => {
+		const req = {
+			body: {
+				"username": "testuser",
+				"role": "admin"
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const createUserWithMock = userController.createUser(UserMock);
+		await createUserWithMock(req, res);
+
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Password cannot be null' }
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(expectedResponse)
+	});
+
+	test('Should not create new user without role', async () => {
+		const req = {
+			body: {
+				"username": "testuser",
+				"password": "testingpw"
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const createUserWithMock = userController.createUser(UserMock);
+		await createUserWithMock(req, res);
+
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Role cannot be null' }
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(expectedResponse)
+	});
+
 	test('Should update user by ID successfully', async () => {
 		const req = {
 			body: {
@@ -179,7 +251,7 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		};
 
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
-		expect(res.json).toHaveBeenCalledWith(expectedResponse)
+		expect(res.json).toHaveBeenCalledWith(expectedResponse);
 	});
 
 	test('Should remove a user record by ID successfully', async () => {

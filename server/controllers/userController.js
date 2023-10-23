@@ -27,6 +27,11 @@ exports.getUser = (User) => async (req, res) => {
 exports.createUser = (User) => async (req, res) => {
 	try {
 		const { username, password, role } = req.body;
+		
+		if (!username) handleError({ message: 'Username cannot be null' }, res, HTTP_STATUS.BAD_REQUEST);
+		if (!password) handleError({message: 'Password cannot be null'}, res, HTTP_STATUS.BAD_REQUEST);
+		if (!role) handleError({message: 'Role cannot be null'}, res, HTTP_STATUS.BAD_REQUEST);
+		
 		const password_hash = await hashPassword(password);
 		const newUser = await User.create({ username, password_hash, role });
 
