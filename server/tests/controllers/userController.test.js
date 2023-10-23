@@ -40,14 +40,20 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		const res = {
 			json: jest.fn(),
 			status: jest.fn(() => res)
-		}
+		};
 
 		const getUserWithMock = userController.getUser(UserMock);
 		await getUserWithMock(req, res);
 
+		const expectedResponse = {
+			status: "success",
+			data: { user: UserArrayMock[2] }
+		};
+
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
-		expect(res.json).toBeCalledWith({ user: UserArrayMock[2] });
+		expect(res.json).toBeCalledWith(expectedResponse);
 	});
+
 
 	test('Should fail for nonexistent user', async () => {
 		const req = { params: { id: 3 } }
@@ -56,11 +62,16 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 			status: jest.fn(() => res)
 		};
 
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Resource not found' }
+		};
+
 		const getUserWithMock = userController.getUser(UserMock);
 		await getUserWithMock(req, res);
 
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
-		expect(res.json).toBeCalledWith(ERR_MESSAGES.USER_NOT_FOUND);
+		expect(res.json).toBeCalledWith(expectedResponse);
 	});
 
 	test('Should get all users successfully', async () => {
@@ -73,9 +84,14 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		const getAllUsersWithMock = userController.getAllUsers(UserMock);
 		await getAllUsersWithMock(req, res);
 
+		const expectedResponse = {
+			status: "success",
+			data: { users: UserArrayMock }
+		};
+
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
 		expect(res.json)
-			.toHaveBeenCalledWith({ users: UserArrayMock });
+			.toHaveBeenCalledWith(expectedResponse);
 	});
 
 	test('Should create a user successfully', async () => {
@@ -94,16 +110,93 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		const createUserWithMock = userController.createUser(UserMock);
 		await createUserWithMock(req, res);
 
-		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.CREATED);
-		expect(res.json)
-			.toHaveBeenCalledWith(expect.objectContaining({
+		const expectedResponse = {
+			status: "success",
+			data: {
 				user: {
 					user_id: expect.any(Number),
 					password_hash: expect.any(String),
 					username: expect.any(String),
 					role: expect.any(String),
 				}
-			}));
+			}
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.CREATED);
+		expect(res.json)
+			.toHaveBeenCalledWith(expect.objectContaining(expectedResponse));
+	});
+
+	test('Should not create new user without username', async () => {
+		const req = {
+			body: {
+				"password": "testing",
+				"role": "admin"
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const createUserWithMock = userController.createUser(UserMock);
+		await createUserWithMock(req, res);
+
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Username cannot be null' }
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(expectedResponse)
+	});
+
+	test('Should not create new user without password', async () => {
+		const req = {
+			body: {
+				"username": "testuser",
+				"role": "admin"
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const createUserWithMock = userController.createUser(UserMock);
+		await createUserWithMock(req, res);
+
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Password cannot be null' }
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(expectedResponse)
+	});
+
+	test('Should not create new user without role', async () => {
+		const req = {
+			body: {
+				"username": "testuser",
+				"password": "testingpw"
+			}
+		};
+		const res = {
+			json: jest.fn(),
+			status: jest.fn(() => res)
+		};
+
+		const createUserWithMock = userController.createUser(UserMock);
+		await createUserWithMock(req, res);
+
+		const expectedResponse = {
+			status: "fail",
+			data: { message: 'Role cannot be null' }
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+		expect(res.json).toHaveBeenCalledWith(expectedResponse)
 	});
 
 	test('Should update user by ID successfully', async () => {
@@ -125,16 +218,21 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		const updateUserWithMock = userController.updateUserById(UserMock);
 		await updateUserWithMock(req, res);
 
-		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
-		expect(res.json)
-			.toHaveBeenCalledWith(expect.objectContaining({
+		const expectedResponse = {
+			status: "success",
+			data: {
 				user: {
 					user_id: expect.any(Number),
 					password_hash: expect.any(String),
 					username: expect.any(String),
 					role: expect.any(String),
 				}
-			}));
+			}
+		};
+
+		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+		expect(res.json)
+			.toHaveBeenCalledWith(expect.objectContaining(expectedResponse));
 	});
 
 	test('Should deny user record delete without ID', async () => {
@@ -147,8 +245,13 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		const deleteUserWithMock = userController.deleteUser(UserMock);
 		await deleteUserWithMock(req, res);
 
+		const expectedResponse = {
+			status: "fail",
+			data: { message: ERR_MESSAGES.INVALID_ID }
+		};
+
 		expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
-		expect(res.json).toHaveBeenCalledWith(ERR_MESSAGES.INVALID_ID)
+		expect(res.json).toHaveBeenCalledWith(expectedResponse);
 	});
 
 	test('Should remove a user record by ID successfully', async () => {
@@ -165,7 +268,12 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 		const deleteUserWithMock = userController.deleteUser(UserMock);
 		await deleteUserWithMock(req, res);
 
+		const expectedResponse = {
+			status: "success",
+			data: { message: 'User deleted successfully' }
+		};
+
 		expect(res.status).toHaveBeenCalledWith(200);
-		expect(res.json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
+		expect(res.json).toHaveBeenCalledWith(expectedResponse);
 	});
 });

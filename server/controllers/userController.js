@@ -27,6 +27,11 @@ exports.getUser = (User) => async (req, res) => {
 exports.createUser = (User) => async (req, res) => {
 	try {
 		const { username, password, role } = req.body;
+		
+		if (!username) handleError({ message: 'Username cannot be null' }, res, HTTP_STATUS.BAD_REQUEST);
+		if (!password) handleError({message: 'Password cannot be null'}, res, HTTP_STATUS.BAD_REQUEST);
+		if (!role) handleError({message: 'Role cannot be null'}, res, HTTP_STATUS.BAD_REQUEST);
+		
 		const password_hash = await hashPassword(password);
 		const newUser = await User.create({ username, password_hash, role });
 
@@ -73,12 +78,12 @@ exports.updateUserById = (User) => async (req, res) => {
 exports.deleteUser = (User) => async (req, res) => {
 	const id = req.params.id;
 
-	if (!id) return handleError(ERR_MESSAGES.INVALID_ID, res, HTTP_STATUS.BAD_REQUEST);
+	if (!id) return handleError({ message: 'Invalid ID' }, res, HTTP_STATUS.BAD_REQUEST);
 
 	try {
 		const user = await User.findByPk(id);
 
-		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
+		if (!user) return handleError({ message: 'User not found' }, res, HTTP_STATUS.NOT_FOUND);
 
 		await User.destroy({ where: { user_id: id } });
 
