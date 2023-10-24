@@ -11,6 +11,8 @@ services:
 
   server:
     build: ./server
+    environment:
+      - JWT_SECRET=yourActualSecretKeyHere
     ports:
       - "3000:3000"
     volumes:
