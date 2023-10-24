@@ -1,7 +1,15 @@
-const express = require('express');
+const apiRoutes = require('express').Router();
+const { expressjwt } = require('express-jwt');
+
 const userRoutes = require('./userRoutes');
-const router = express.Router();
 
-router.use('/users', userRoutes);
+// protect all api routes
+apiRoutes.use('/', expressjwt({
+	secret: process.env.JWT_SECRET,
+	algorithms: ['HS256'],
+	onExpired: '1h'
+}))
 
-module.exports = router;
+apiRoutes.use('/users', userRoutes);
+
+module.exports = apiRoutes;
