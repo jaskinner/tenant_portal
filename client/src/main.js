@@ -1,16 +1,18 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import instance from './axios'
+import axios from "axios";
 
 import App from './App.vue'
-import router from './router'
+
+const instance = axios.create({
+	baseURL: 'http://localhost:3000',
+	timeout: 1000,
+	headers: { 'Content-Type': 'application/json' }
+});
 
 const app = createApp(App)
 
 app.use(createPinia())
-app.use(router)
 
 app.provide('$axios', instance);
 
