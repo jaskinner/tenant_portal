@@ -1,14 +1,20 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-const router = require('./routes');
-const seeds = require('./db/seeders/initUserSeed');
-const userseed = seeds.seeduser();
+
+// seed admin user
+const seeduser = require('./db/seeders/initUserSeed')();
+
+const authRoutes = require('./auth');
+const apiRoutes = require('./routes');
+
 const app = express();
 
 app.use(express.json());
 app.use(cors())
 app.use(morgan('combined'));
-app.use('/api', router);
+
+app.use('/login', authRoutes);
+app.use('/api', apiRoutes);
 
 module.exports = app;
