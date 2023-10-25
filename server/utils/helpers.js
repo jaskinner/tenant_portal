@@ -6,6 +6,12 @@ const handleError = (error, res, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR)
 		status: '',
 	}
 
+	if (statusCode === HTTP_STATUS.UNAUTHORIZED) {
+		response.status = 'fail';
+		response.data = error;
+		return res.status(HTTP_STATUS.UNAUTHORIZED).json(response);
+	}
+
 	if (statusCode === HTTP_STATUS.BAD_REQUEST) {
 		response.status = 'fail';
 		response.data = error;

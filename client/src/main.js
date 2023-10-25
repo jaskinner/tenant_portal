@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import axios from "axios";
 
 import App from './App.vue'
+import router from './router'
 
 const instance = axios.create({
 	baseURL: 'http://localhost:3000',
@@ -15,5 +16,5 @@ const app = createApp(App)
 app.use(createPinia())
 
 app.provide('$axios', instance);
-
+app.use(router)
 app.mount('#app')
