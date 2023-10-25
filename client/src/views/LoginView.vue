@@ -1,12 +1,36 @@
 <template>
 	<form @submit.prevent="login">
-		<input type="text" v-model="username" placeholder="Username" />
-		<input type="password" v-model="password" placeholder="Password" />
-		<button type="submit">Login</button>
+		<div class="mb-3">
+			<label for="usernameField">Username</label>
+			<input
+				type="text"
+				v-model="username"
+				placeholder="Username"
+				id="usernameField"
+				class="form-control"
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="passwordField">Password</label>
+			<input
+				type="password"
+				v-model="password"
+				placeholder="Password"
+				id="passwordField"
+				class="form-control"
+			/>
+		</div>
+		<div class="mb-3">
+			<button type="submit" class="btn btn-primary">Login</button>
+		</div>
 
-		<button @click="getUsers">get users</button>
+		<div>
+			<button class="btn btn-secondary" @click="getUsers">Get Users</button>
+		</div>
 
-		<span>{{ users }}</span>
+		<ul>
+			<li v-for="user in users" :key="user.user_id">{{ user.username }}</li>
+		</ul>
 	</form>
 </template>
 
