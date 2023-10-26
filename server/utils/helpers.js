@@ -1,10 +1,15 @@
 const bcrypt = require('bcrypt');
 const { HTTP_STATUS, ERR_MESSAGES } = require('./constants');
-const { Sequelize } = require('sequelize');
 
 const handleError = (error, res, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR) => {
 	let response = {
 		status: '',
+	}
+
+	if (statusCode === HTTP_STATUS.UNAUTHORIZED) {
+		response.status = 'fail';
+		response.data = error;
+		return res.status(HTTP_STATUS.UNAUTHORIZED).json(response);
 	}
 
 	if (statusCode === HTTP_STATUS.BAD_REQUEST) {
