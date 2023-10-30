@@ -17,6 +17,18 @@ const Property = db.define('Property', {
 		allowNull: false,
 		unique: true
 	},
+	city: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	state: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	zip: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
 	category: {
 		type: DataTypes.STRING
 	},
@@ -24,5 +36,8 @@ const Property = db.define('Property', {
 		type: DataTypes.STRING
 	},
 });
+
+// TODO: Create association to owner
+// Property.belongsTo()
 
 module.exports = Property;

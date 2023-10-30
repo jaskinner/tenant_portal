@@ -10,4 +10,5 @@ exports.HTTP_STATUS = {
 exports.ERR_MESSAGES = {
 	INVALID_ID: 'Invalid ID',
 	USER_NOT_FOUND: 'User not found',
+	PROPERTY_NOT_FOUND: 'Property not found',
 }
