@@ -10,4 +10,5 @@ const seeduser = async () => {
 
 	return user;
 }
+
 module.exports = seeduser

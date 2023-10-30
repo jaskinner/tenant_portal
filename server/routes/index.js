@@ -3,6 +3,7 @@ const { expressjwt } = require('express-jwt');
 
 const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
+const propertyRoutes = require('./propertyRoutes');
 
 apiRoutes.use('/auth', authRoutes);
 
@@ -13,5 +14,6 @@ apiRoutes.use('/', expressjwt({
 }))
 
 apiRoutes.use('/users', userRoutes);
+apiRoutes.use('/properties', propertyRoutes);
 
 module.exports = apiRoutes;

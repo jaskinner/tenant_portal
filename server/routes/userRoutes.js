@@ -1,7 +1,7 @@
 const userRoutes = require('express').Router();
 const userController = require('../controllers/userController');
 
-const User = require('../db/models/User')
+const User = require('../db/models/User');
 
 userRoutes.get('/', userController.getAllUsers(User));
 userRoutes.get('/:id', userController.getUser(User));
