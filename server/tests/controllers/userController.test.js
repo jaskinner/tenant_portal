@@ -29,9 +29,9 @@ const UserMock = {
 	destroy: jest.fn((options) => {
 		const id = options.where.user_id;
 
-		return {}
+		return;
 	}),
-}
+};
 
 describe("User Operations: Create, Read, Update, Delete", () => {
 
@@ -114,10 +114,10 @@ describe("User Operations: Create, Read, Update, Delete", () => {
 			status: "success",
 			data: {
 				user: {
-					user_id: expect.any(Number),
-					password_hash: expect.any(String),
-					username: expect.any(String),
-					role: expect.any(String),
+					"user_id": expect.any(Number),
+					"password_hash": expect.any(String),
+					"username": "Jon234",
+					"role": "admin"
 				}
 			}
 		};
