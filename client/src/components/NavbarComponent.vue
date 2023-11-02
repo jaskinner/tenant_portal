@@ -1,60 +1,71 @@
 <template>
-	<nav class="navbar navbar-expand-lg bg-secondary">
-		<div class="container">
-			<a class="navbar-brand" href="#">Navbar</a>
+	<nav class="navbar navbar-expand-lg bg-body-tertiary">
+		<div class="container-fluid">
+			<router-link class="navbar-brand" to="/"> Portal </router-link>
 			<button
 				class="navbar-toggler"
 				type="button"
 				data-bs-toggle="collapse"
-				data-bs-target="#navbarSupportedContent"
-				aria-controls="navbarSupportedContent"
+				data-bs-target="#navbarNav"
+				aria-controls="navbarNav"
 				aria-expanded="false"
 				aria-label="Toggle navigation"
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
 					<li class="nav-item">
-						<a class="nav-link active" aria-current="page" href="#">Home</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#">Link</a>
-					</li>
-					<li class="nav-item dropdown">
-						<a
-							class="nav-link dropdown-toggle"
-							href="#"
-							role="button"
-							data-bs-toggle="dropdown"
-							aria-expanded="false"
-						>
-							Dropdown
-						</a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="#">Action</a></li>
-							<li><a class="dropdown-item" href="#">Another action</a></li>
-							<li><hr class="dropdown-divider" /></li>
-							<li><a class="dropdown-item" href="#">Something else here</a></li>
-						</ul>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link disabled" aria-disabled="true">Disabled</a>
-					</li>
-					<li class="nav-item">
-						<a @click="logout">Log out</a>
+						<router-link class="nav-link" aria-current="page" to="/profile">
+							Profile
+						</router-link>
 					</li>
 				</ul>
+				<form v-if="!isLoggedIn" class="d-flex" @submit.prevent="login">
+					<label for="usernameField">Username</label>
+					<input
+						type="text"
+						v-model="username"
+						placeholder="Username"
+						id="usernameField"
+						class="form-control"
+					/>
+					<label for="passwordField">Password</label>
+					<input
+						type="password"
+						v-model="password"
+						placeholder="Password"
+						id="passwordField"
+						class="form-control"
+					/>
+					<button class="btn btn-outline-success" @click="login" type="submit">
+						Login
+					</button>
+				</form>
+				<form v-if="isLoggedIn" class="d-flex" @submit.prevent="logout">
+					<button class="btn btn-outline-success" @click="logout">Logout</button>
+				</form>
 			</div>
 		</div>
 	</nav>
 </template>
 
 <script setup>
+import { computed, ref, inject } from 'vue'
 import { useAuthStore } from '@/store/auth'
 
-const auth = useAuthStore();
-const logout = async () => {
-	auth.clearToken();
+const $axios = inject('$axios')
+const auth = useAuthStore()
+const isLoggedIn = computed(() => auth.isLoggedIn)
+
+const username = ref('')
+const password = ref('')
+
+const login = async () => {
+	auth.login($axios, username.value, password.value)
+}
+
+const logout = () => {
+	auth.logout()
 }
 </script>
