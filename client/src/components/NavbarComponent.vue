@@ -58,6 +58,11 @@ const $axios = inject('$axios')
 const auth = useAuthStore()
 const isLoggedIn = computed(() => auth.isLoggedIn)
 
+if (isLoggedIn.value) {
+	$axios.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`
+	auth.fetchUser($axios);
+}
+
 const username = ref('')
 const password = ref('')
 

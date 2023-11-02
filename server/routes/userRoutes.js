@@ -3,6 +3,7 @@ const userController = require('../controllers/userController');
 
 const User = require('../db/models/User');
 
+userRoutes.get('/me', userController.getMyUser(User));
 userRoutes.get('/', userController.getAllUsers(User));
 userRoutes.get('/:id', userController.getUser(User));
 userRoutes.post('/', userController.createUser(User));
