@@ -26,7 +26,11 @@ export const useAuthStore = defineStore({
 				const { data } = await $axios.get('/api/users/me');
 
 				if (data.data && data.data.user) {
-					this.updateUser(data.data.user);
+					this.updateUser({
+						id: data.data.user.user_id,
+						username: data.data.user.username,
+						role: data.data.user.role,
+					});
 				}
 			} catch (error) {
 				console.log(error)

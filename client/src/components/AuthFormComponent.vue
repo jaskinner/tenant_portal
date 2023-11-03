@@ -60,7 +60,7 @@ const isLoggedIn = computed(() => auth.isLoggedIn)
 const username = ref('')
 const password = ref('')
 
-const login = async () => {
+const login = () => {
 	auth.login($axios, username.value, password.value)
 }
 

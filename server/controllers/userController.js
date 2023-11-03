@@ -1,20 +1,16 @@
 const { HTTP_STATUS, ERR_MESSAGES, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
 
 exports.getMyUser = (User) => async (req, res) => {
+	const id = req.user.user_id;
+
 	try {
-		const user = await User.findByPk(1);
+		const user = await User.findByPk(id);
 
-		handleSuccess({ user: { id: user.user_id, username: user.username, role: user.role } }, res)
-	} catch (error) {
-		handleError(error, res)
-	}
-}
+		console.log()
 
-exports.getAllUsers = (User) => async (req, res) => {
-	try {
-		const users = await User.findAll();
+		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
-		handleSuccess({ users: users }, res);
+		handleSuccess({ user: user }, res);
 	} catch (error) {
 		handleError(error, res);
 	}
@@ -29,6 +25,16 @@ exports.getUser = (User) => async (req, res) => {
 		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		handleSuccess({ user: user }, res);
+	} catch (error) {
+		handleError(error, res);
+	}
+}
+
+exports.getAllUsers = (User) => async (req, res) => {
+	try {
+		const users = await User.findAll();
+
+		handleSuccess({ users: users }, res);
 	} catch (error) {
 		handleError(error, res);
 	}
