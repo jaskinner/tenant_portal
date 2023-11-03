@@ -11,7 +11,7 @@
 		</a>
 		<ul class="dropdown-menu dropdown-menu-end">
 			<li v-if="!isLoggedIn">
-				<form @submit.prevent="login" class="px-4 py-3">
+				<form @submit.prevent="login" class="login-form px-4 py-3">
 					<div class="mb-3">
 						<input
 							v-model="username"
@@ -68,3 +68,9 @@ const logout = () => {
 	auth.logout()
 }
 </script>
+
+<style scoped>
+.login-form {
+	min-width: 300px;
+}
+</style>
