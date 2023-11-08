@@ -6,7 +6,7 @@ import App from './App.vue'
 import router from './router'
 
 import './scss/styles.scss'
-import * as bootstrap from 'bootstrap';
+import 'bootstrap';
 
 const instance = axios.create({
 	baseURL: 'http://localhost:3000',
@@ -17,7 +17,6 @@ const instance = axios.create({
 const app = createApp(App)
 
 app.use(createPinia())
-app.use(bootstrap)
 
 app.provide('$axios', instance);
 app.use(router)

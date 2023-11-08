@@ -1,15 +1,20 @@
 <script setup>
 import NavbarComponent from './components/NavbarComponent.vue'
-import { inject } from 'vue'
+import { computed, inject } from 'vue'
+import { useAuthStore } from '@/store/auth'
 
 const $axios = inject('$axios')
-const token = localStorage.getItem('auth_token')
+const auth = useAuthStore()
+const isLoggedIn = computed(() => auth.isLoggedIn)
 
-if (token) {
-	$axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+if (isLoggedIn.value) {
+	$axios.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`
+	auth.fetchUser($axios)
 }
 </script>
 <template>
 	<NavbarComponent></NavbarComponent>
-	<router-view></router-view>
+	<div class="container-fluid">
+		<router-view></router-view>
+	</div>
 </template>

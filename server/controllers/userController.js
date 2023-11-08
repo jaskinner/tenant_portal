@@ -1,10 +1,16 @@
 const { HTTP_STATUS, ERR_MESSAGES, hashPassword, handleError, handleSuccess } = require('../utils/helpers');
 
-exports.getAllUsers = (User) => async (req, res) => {
-	try {
-		const users = await User.findAll();
+exports.getMyUser = (User) => async (req, res) => {
+	const id = req.user.user_id;
 
-		handleSuccess({ users: users }, res);
+	try {
+		const user = await User.findByPk(id);
+
+		console.log()
+
+		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
+
+		handleSuccess({ user: user }, res);
 	} catch (error) {
 		handleError(error, res);
 	}
@@ -24,14 +30,24 @@ exports.getUser = (User) => async (req, res) => {
 	}
 }
 
+exports.getAllUsers = (User) => async (req, res) => {
+	try {
+		const users = await User.findAll();
+
+		handleSuccess({ users: users }, res);
+	} catch (error) {
+		handleError(error, res);
+	}
+}
+
 exports.createUser = (User) => async (req, res) => {
 	try {
 		const { username, password, role } = req.body;
-		
+
 		if (!username) handleError({ message: 'Username cannot be null' }, res, HTTP_STATUS.BAD_REQUEST);
-		if (!password) handleError({message: 'Password cannot be null'}, res, HTTP_STATUS.BAD_REQUEST);
-		if (!role) handleError({message: 'Role cannot be null'}, res, HTTP_STATUS.BAD_REQUEST);
-		
+		if (!password) handleError({ message: 'Password cannot be null' }, res, HTTP_STATUS.BAD_REQUEST);
+		if (!role) handleError({ message: 'Role cannot be null' }, res, HTTP_STATUS.BAD_REQUEST);
+
 		const password_hash = await hashPassword(password);
 		const newUser = await User.create({ username, password_hash, role });
 
