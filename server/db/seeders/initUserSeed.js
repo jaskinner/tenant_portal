@@ -1,5 +1,5 @@
-const { hashPassword } = require('../../utils/helpers')
-const User = require('../../db/models/User')
+const { hashPassword } = require('../../utils/helpers');
+const { User, Property } = require('../associations');
 
 const seeduser = async () => {
 	const adminUser = await User.create({
@@ -12,9 +12,25 @@ const seeduser = async () => {
 		username: "tenant",
 		password_hash: await hashPassword("tenant"),
 		role: "tenant"
-	})
+	});
 
-	return { adminUser, tenantUser };
+	const ownerUser = await User.create({
+		username: "owner",
+		password_hash: await hashPassword("owner"),
+		role: "owner"
+	});
+
+	const seedProperty = await Property.create({
+		address: "123 smith road",
+		city: "Raleigh",
+		state: "NC",
+		zip: "27609",
+	});
+
+	await seedProperty.setOwner(ownerUser);
+	await seedProperty.setTenant(tenantUser);
+
+	return { adminUser, tenantUser, ownerUser, seedProperty };
 }
 
 module.exports = seeduser

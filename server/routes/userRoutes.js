@@ -1,8 +1,7 @@
 const userRoutes = require('express').Router();
 const userController = require('../controllers/userController');
-const { authVerify } = require('../controllers/authController')
-
-const User = require('../db/models/User');
+const { authVerify } = require('../controllers/authController');
+const { User } = require('../db/associations');
 
 userRoutes.get('/me', authVerify, userController.getMyUser(User));
 userRoutes.get('/', userController.getAllUsers(User));

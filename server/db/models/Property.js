@@ -10,7 +10,9 @@ const Property = db.define('Property', {
 	},
 	owner_id: {
 		type: DataTypes.INTEGER,
-		allowNull: false
+	},
+	tenant_id: {
+		type: DataTypes.INTEGER,
 	},
 	address: {
 		type: DataTypes.STRING,
@@ -29,15 +31,6 @@ const Property = db.define('Property', {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
-	category: {
-		type: DataTypes.STRING
-	},
-	status: {
-		type: DataTypes.STRING
-	},
 });
-
-// TODO: Create association to owner
-// Property.belongsTo()
 
 module.exports = Property;
