@@ -6,8 +6,6 @@ exports.getMyUser = (User) => async (req, res) => {
 	try {
 		const user = await User.findByPk(id);
 
-		console.log()
-
 		if (!user) return handleError(ERR_MESSAGES.USER_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		handleSuccess({ user: user }, res);

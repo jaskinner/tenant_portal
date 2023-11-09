@@ -10,17 +10,19 @@ exports.getAllProperties = (Property) => async (req, res) => {
 	}
 };
 
-exports.getProperty = (Property) => async (req, res) => {
-	const id = req.params.id;
+exports.getPropertyByOwner = (Property) => async (req, res) => {
+	// const ownerId = req.user_id;
+
+
 
 	try {
-		const property = await Property.findByPk(id);
+		const property = await Property.findOne({ where: { owner_id: 3 } });
 
 		if (!property) return handleError(ERR_MESSAGES.PROPERTY_NOT_FOUND, res, HTTP_STATUS.NOT_FOUND);
 
 		handleSuccess({ property: property }, res);
 	} catch (error) {
-		handleError(error.res);
+		handleError(error, res);
 	}
 };
 

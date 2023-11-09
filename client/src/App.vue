@@ -10,8 +10,10 @@ const isLoggedIn = computed(() => auth.isLoggedIn)
 if (isLoggedIn.value) {
 	$axios.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`
 	auth.fetchUser($axios)
+	auth.fetchProperty($axios)
 }
 </script>
+
 <template>
 	<NavbarComponent></NavbarComponent>
 	<div class="container-fluid">

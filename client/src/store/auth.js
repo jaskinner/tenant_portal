@@ -4,7 +4,8 @@ export const useAuthStore = defineStore({
 	id: 'auth',
 	state: () => ({
 		token: localStorage.getItem('auth_token') || '',
-		user: null
+		user: null,
+		property: null
 	}),
 	getters: {
 		isLoggedIn: (state) => !!state.token
@@ -21,6 +22,9 @@ export const useAuthStore = defineStore({
 		updateUser(user) {
 			this.user = user;
 		},
+		updateProperty(property) {
+			this.property = property;
+		},
 		async fetchUser($axios) {
 			try {
 				const { data } = await $axios.get('/api/users/me');
@@ -33,7 +37,23 @@ export const useAuthStore = defineStore({
 					});
 				}
 			} catch (error) {
-				console.log(error)
+				console.log(error.message)
+			}
+		},
+		async fetchProperty($axios) {
+			try {
+				const { data } = await $axios.get('/api/properties');
+
+				if(data) {
+					this.updateProperty({
+						address: data.data.property.address,
+						city: data.data.property.city,
+						state: data.data.property.state,
+						zip: data.data.property.zip,
+					})
+				}
+			} catch (error) {
+				console.log(error.message)
 			}
 		},
 		async login($axios, username, password) {
@@ -50,7 +70,7 @@ export const useAuthStore = defineStore({
 
 				$axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
 			} catch (error) {
-				console.log(error)
+				console.log(error.message)
 			}
 		},
 		logout() {
