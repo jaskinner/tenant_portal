@@ -17,7 +17,7 @@
 							v-model="username"
 							type="text"
 							class="form-control"
-							placeholder="username"
+							placeholder="Username"
 						/>
 					</div>
 					<div class="mb-3">
@@ -55,13 +55,13 @@ import { useAuthStore } from '@/store/auth'
 
 const $axios = inject('$axios')
 const auth = useAuthStore()
-const isLoggedIn = computed(() => auth.isLoggedIn)
+const isLoggedIn = computed(() => auth.isAuthenticated)
 
 const username = ref('')
 const password = ref('')
 
 const login = () => {
-	auth.login($axios, username.value, password.value)
+	auth.login($axios, { username: username.value, password: password.value })
 }
 
 const logout = () => {

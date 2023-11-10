@@ -3,8 +3,6 @@ const propertyController = require('../controllers/propertyController');
 
 const { Property } = require('../db/associations');
 
-propertyRoutes.get('/', propertyController.getPropertyByOwner(Property));
-// propertyRoutes.get('/', propertyController.getAllProperties(Property));
-propertyRoutes.post('/', propertyController.createProperty(Property));
+propertyRoutes.get('/', propertyController.getPropertiesByOwner(Property));
 
 module.exports = propertyRoutes;
