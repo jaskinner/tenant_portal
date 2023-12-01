@@ -6,7 +6,8 @@
 			<li>Username: {{ user.username }}</li>
 			<li>Role: {{ user.role }}</li>
 		</ul>
-
+	</div>
+	<div v-if="property">
 		<h2>Properties</h2>
 		<ul>
 			<li>Address: {{ property.address }}</li>
